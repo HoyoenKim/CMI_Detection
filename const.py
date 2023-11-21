@@ -2,7 +2,7 @@ train_series_ids = [
   "038441c925bb",
   "0402a003dae9",
   "04f547b8017d",
-  #"05e1944c3818",
+  "05e1944c3818",
   "062cae666e2a",
   "062dbd4c95e6",
   "08db4255286f",
@@ -220,7 +220,9 @@ train_series_ids = [
   "fa149c3c4bde",
   "fb223ed2278c",
   "fcca183903b7",
-  #"03d92c9f6f8a",
+]
+valid_series_ids =[
+  "03d92c9f6f8a",
   "0cd1e3d0ed95",
   "0cfc06c129cc",
   "12d01911d509",
@@ -275,7 +277,4 @@ train_series_ids = [
   "f56824b503a0",
   "f7eb179216c2",
   "fbf33b1a2c10",
-]
-valid_series_ids = [
-  "fe90110788d2"
 ]

@@ -5,3 +5,4 @@ __pycache__
 *.pth
 /lightning_logs
 *.csv
+.DS_Store
