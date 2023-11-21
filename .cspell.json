@@ -1,5 +1,8 @@
 {
     "words": [
+        "autocast",
+        "psutil",
+        "getpid",
         "hyperparams",
         "wandb",
         "levelname",

@@ -1,5 +1,6 @@
 from preprocess.preprocess import preprocess
 from train.train import train
+from inference.inference import inference
 
 if __name__ == "__main__":
     # preprocess
@@ -122,9 +123,40 @@ if __name__ == "__main__":
         "exp_name": "exp00",
         "trainer": trainer_config,
     }
-    do_train = True
+    do_train = False
     if do_train:
         train(train_config)
+
+    test_dir_config = {
+        "processed_dir": './data_test',
+        "train_events_path": './raw_data/train_events.csv'
+    }
+    inference_config = {
+        "seed": 42,
+        "dir": test_dir_config,
+        "features": features,
+        "labels": labels,
+        "batch_size": 32,
+        "num_workers": 8,
+        "duration": 5760,
+        "downsample_rate": 2,
+        "upsample_rate": 1,
+        "dataset": dataset_config,
+        "aug": aug_config,
+        "pp": postprocess_config,
+        "model": model_config,
+        "feature_extractor": feature_extractor_config,
+        "decoder": decoder_config,
+        "use_amp": True,
+    }
+    test_series_path = "./raw_data/test_series.parquet"
+    test_series_save_dir = "./data_test"
+    do_test_preprocess = False
+    if do_test_preprocess:
+        preprocess(test_series_path, test_series_save_dir)
+    do_inference = True
+    if do_inference:
+        inference(inference_config)
 
     
     
