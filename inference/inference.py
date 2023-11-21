@@ -13,14 +13,13 @@ from model.common import get_model
 from common.util import nearest_valid_size, trace
 from common.postprocess import post_process_for_seg
 
-def load_model(cfg, device):
+def load_model(cfg, device, model_path):
     num_timesteps = nearest_valid_size(int(cfg["duration"] * cfg["upsample_rate"]), cfg["downsample_rate"])
     model = get_model(cfg, feature_dim=len(cfg["features"]), n_classes=len(cfg["labels"]), num_timesteps=num_timesteps // cfg["downsample_rate"], test=True)
 
     # load weights
-    weight_path = "./best_model.pth"
-    model.load_state_dict(torch.load(weight_path, map_location=device))
-    print('load weight from "{}"'.format(weight_path))
+    model.load_state_dict(torch.load(model_path, map_location=device))
+    print('load weight from "{}"'.format(model_path))
 
     return model
 
@@ -77,14 +76,12 @@ def do_inference(duration, loader, model, device, use_amp):
 
     return keys, preds
 
-def inference(cfg):
+def inference(cfg, model_path, submission_path):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     seed_everything(cfg["seed"])
     test_dataloader = get_test_dataloader(cfg)
-    model = load_model(cfg, device)
+    model = load_model(cfg, device, model_path)
     keys, preds = do_inference(cfg["duration"], test_dataloader, model, device, use_amp=cfg["use_amp"])
-    print('f')
     sub_df = post_process_for_seg(keys, preds, score_th=cfg["pp"]["score_th"], distance=cfg["pp"]["distance"])
-    print('g')
-    sub_df.write_csv("./submission.csv")
+    sub_df.write_csv(submission_path)
