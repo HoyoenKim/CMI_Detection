@@ -77,11 +77,18 @@ def do_inference(duration, loader, model, device, use_amp):
     return keys, preds
 
 def inference(cfg, model_path, submission_path):
+    seed_everything(cfg["seed"])
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    seed_everything(cfg["seed"])
+    print("load test dataloader")
     test_dataloader = get_test_dataloader(cfg)
+    
+    print("load model")
     model = load_model(cfg, device, model_path)
+
+    print("inference")
     keys, preds = do_inference(cfg["duration"], test_dataloader, model, device, use_amp=cfg["use_amp"])
+    
+    print("make submission")
     sub_df = post_process_for_seg(keys, preds, score_th=cfg["pp"]["score_th"], distance=cfg["pp"]["distance"])
     sub_df.write_csv(submission_path)

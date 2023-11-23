@@ -4,8 +4,8 @@ import numpy as np
 
 from common.util import pad_if_needed
 from datamodule.seg import SegTestDataset, SegTrainDataset, SegValidDataset
-#from datamodule.detr import DETRTestDataset, DETRTrainDataset, DETRValidDataset
-#from datamodule.centernet import CenterNetTestDataset, CenterNetTrainDataset, CenterNetValidDataset
+from datamodule.detr import DETRTestDataset, DETRTrainDataset, DETRValidDataset
+from datamodule.centernet import CenterNetTestDataset, CenterNetTrainDataset, CenterNetValidDataset
 
 def load_features(feature_names, series_ids, processed_dir):
     features = {}
@@ -37,17 +37,29 @@ def load_chunk_features(duration, feature_names, series_ids, processed_dir):
 def get_train_ds(cfg, event_df, features):
     if cfg["dataset"]["name"] == "seg":
         return SegTrainDataset(cfg=cfg, features=features, event_df=event_df)
+    elif cfg["dataset"]["name"] == "detr":
+        return DETRTrainDataset(cfg=cfg, features=features, event_df=event_df)
+    elif cfg["dataset"]["name"] == "centernet":
+        return CenterNetTrainDataset(cfg=cfg, features=features, event_df=event_df)
     else:
         raise ValueError(f"Invalid dataset name: {cfg['dataset']['name']}")
 
 def get_valid_ds(cfg, event_df, chunk_features):
     if cfg["dataset"]["name"] == "seg":
         return SegValidDataset(cfg=cfg, chunk_features=chunk_features, event_df=event_df)
+    elif cfg["dataset"]["name"] == "detr":
+        return DETRValidDataset(cfg=cfg, features=chunk_features, event_df=event_df)
+    elif cfg["dataset"]["name"] == "centernet":
+        return CenterNetValidDataset(cfg=cfg, features=chunk_features, event_df=event_df)
     else:
         raise ValueError(f"Invalid dataset name: {cfg['dataset']['name']}")
 
 def get_test_ds(cfg, chunk_features):
     if cfg["dataset"]["name"] == "seg":
         return SegTestDataset(cfg=cfg, chunk_features=chunk_features)
+    elif cfg["dataset"]["name"] == "detr":
+        return DETRTestDataset(cfg=cfg, chunk_features=chunk_features)
+    elif cfg["dataset"]["name"] == "centernet":
+        return CenterNetTestDataset(cfg=cfg, chunk_features=chunk_features)
     else:
         raise ValueError(f"Invalid dataset name: {cfg['dataset']['name']}")

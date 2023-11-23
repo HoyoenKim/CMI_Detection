@@ -6,27 +6,48 @@ from tqdm import tqdm
 from preprocess.const import ANGLEZ_MEAN, ANGLEZ_STD, ENMO_MEAN, ENMO_STD, FEATURE_NAMES  
 from preprocess.util import deg_to_rad, add_feature, save_each_series
 
-def preprocess(train_series_path, train_series_save_dir, save = True):
+def preprocess(train_series_path, train_series_save_dir, env, save = True):
     series_lf = pl.scan_parquet(train_series_path, low_memory=True)
-    series_df = (
-        series_lf.with_columns(
-            pl.col("timestamp").str.to_datetime("%Y-%m-%dT%H:%M:%S%z"),
-            deg_to_rad(pl.col("anglez")).alias("anglez_rad"),
-            (pl.col("anglez") - ANGLEZ_MEAN) / ANGLEZ_STD,
-            (pl.col("enmo") - ENMO_MEAN) / ENMO_STD,
+    if env == "colab":
+        series_df = (
+            series_lf.with_columns(
+                pl.col("timestamp").str.strptime(pl.Datetime, "%Y-%m-%dT%H:%M:%S%z", utc=True),
+                deg_to_rad(pl.col("anglez")).alias("anglez_rad"),
+                (pl.col("anglez") - ANGLEZ_MEAN) / ANGLEZ_STD,
+                (pl.col("enmo") - ENMO_MEAN) / ENMO_STD,
+            )
+            .select(
+                [
+                    pl.col("series_id"),
+                    pl.col("anglez"),
+                    pl.col("enmo"),
+                    pl.col("timestamp"),
+                    pl.col("anglez_rad"),
+                ]
+            )
+            .collect(streaming=True)
+            .sort(by=["series_id", "timestamp"])
         )
-        .select(
-            [
-                pl.col("series_id"),
-                pl.col("anglez"),
-                pl.col("enmo"),
-                pl.col("timestamp"),
-                pl.col("anglez_rad"),
-            ]
+    else:
+        series_df = (
+            series_lf.with_columns(
+                pl.col("timestamp").str.to_datetime("%Y-%m-%dT%H:%M:%S%z"),
+                deg_to_rad(pl.col("anglez")).alias("anglez_rad"),
+                (pl.col("anglez") - ANGLEZ_MEAN) / ANGLEZ_STD,
+                (pl.col("enmo") - ENMO_MEAN) / ENMO_STD,
+            )
+            .select(
+                [
+                    pl.col("series_id"),
+                    pl.col("anglez"),
+                    pl.col("enmo"),
+                    pl.col("timestamp"),
+                    pl.col("anglez_rad"),
+                ]
+            )
+            .collect(streaming=True)
+            .sort(by=["series_id", "timestamp"])
         )
-        .collect(streaming=True)
-        .sort(by=["series_id", "timestamp"])
-    )
     n_unique = series_df.get_column("series_id").n_unique()
 
     if save:

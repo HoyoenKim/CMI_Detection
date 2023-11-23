@@ -278,3 +278,5 @@ valid_series_ids =[
   "f7eb179216c2",
   "fbf33b1a2c10",
 ]
+if __name__ == "__main__":
+  print("Number of train series: ", len(train_series_ids))
