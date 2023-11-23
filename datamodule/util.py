@@ -48,9 +48,9 @@ def get_valid_ds(cfg, event_df, chunk_features):
     if cfg["dataset"]["name"] == "seg":
         return SegValidDataset(cfg=cfg, chunk_features=chunk_features, event_df=event_df)
     elif cfg["dataset"]["name"] == "detr":
-        return DETRValidDataset(cfg=cfg, features=chunk_features, event_df=event_df)
+        return DETRValidDataset(cfg=cfg, chunk_features=chunk_features, event_df=event_df)
     elif cfg["dataset"]["name"] == "centernet":
-        return CenterNetValidDataset(cfg=cfg, features=chunk_features, event_df=event_df)
+        return CenterNetValidDataset(cfg=cfg, chunk_features=chunk_features, event_df=event_df)
     else:
         raise ValueError(f"Invalid dataset name: {cfg['dataset']['name']}")
 
