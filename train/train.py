@@ -79,6 +79,6 @@ def train(cfg):
         num_classes=len(cfg["labels"]),
         duration=cfg["duration"],
     )
-    weights_path = str("model_weights.pth")  # type: ignore
+    weights_path = cfg["dir"]["model_path"]  # type: ignore
     LOGGER.info(f"Extracting and saving best weights: {weights_path}")
     torch.save(model.model.state_dict(), weights_path)

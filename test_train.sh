@@ -13,7 +13,7 @@ distance=40
 score_th=0.05
 
 feature_args="anglez,enmo,hour_sin,hour_cos,anglez_diff,enmo_diff"
-epochs=50
+epochs=1
 
 # Loop through each combination of configurations
 for dataset in "${datasets[@]}"; do
