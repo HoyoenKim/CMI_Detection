@@ -23,6 +23,8 @@ def add_feature(series_df, FEATURE_NAMES):
             pl.col("step") / pl.count("step"),
             pl.col('anglez_rad').sin().alias('anglez_sin'),
             pl.col('anglez_rad').cos().alias('anglez_cos'),
+            pl.col("anglez_diff"),
+            pl.col("enmo_diff"),
         )
         .select("series_id", *FEATURE_NAMES)
     )
@@ -30,5 +32,15 @@ def add_feature(series_df, FEATURE_NAMES):
 
 def save_each_series(this_series_df, FEATURE_NAMES, this_series_save_path):
     for col_name in FEATURE_NAMES:
-        x = this_series_df.get_column(col_name).to_numpy(zero_copy_only=True)
+        column_series = this_series_df.get_column(col_name)
+        if col_name in ["anglez_diff", "enmo_diff"]:
+            column_series[0] = 0
+        
+        if col_name in ["anglez", "enmo", "anglez_diff", "enmo_diff"]:
+            mean = column_series.mean()
+            std = column_series.std()
+            if std > 0:
+                column_series = (column_series - mean) / std
+
+        x = column_series.to_numpy(zero_copy_only=True)
         np.save(os.path.join(this_series_save_path, f"{col_name}.npy"), x)

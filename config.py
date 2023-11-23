@@ -1,6 +1,6 @@
 from const import train_series_ids, valid_series_ids
 
-def gen_config(phase, env, dataset, feature_extractor, model, decoder, postprocess_config, num_workers = 2, downsample_rate = 2, batch_size = 32, epochs = 50):
+def gen_config(phase, env, dataset, feature_extractor, model, decoder, postprocess_config, feature_arg, num_workers = 2, downsample_rate = 2, batch_size = 32, epochs = 50):
     # Dataset
     seg = {
       "name": "seg",
@@ -167,12 +167,6 @@ def gen_config(phase, env, dataset, feature_extractor, model, decoder, postproce
         "monitor_mode": "min",
         "check_val_every_n_epoch": 1,
     }
-    features = [
-        "anglez",
-        "enmo",
-        "hour_sin",
-        "hour_cos",
-    ]
     labels = [
         "awake",
         "event_onset",
@@ -182,7 +176,7 @@ def gen_config(phase, env, dataset, feature_extractor, model, decoder, postproce
     decoder_config = None
     train_dir_config = None
     test_dir_config = None
-    model_name_postfix = f"{dataset}_{feature_extractor}_{model}_{decoder}"
+    model_name_postfix = f"{dataset}_{feature_extractor}_{model}_{decoder}_{feature_arg}"
     if env == "local" or env == "colab":
         train_dir_config = {
             "processed_dir": './data',
@@ -256,6 +250,7 @@ def gen_config(phase, env, dataset, feature_extractor, model, decoder, postproce
     elif decoder == "MLPDecoder":
         decoder_config = MLPDecoder
 
+    features = feature_arg.split(',')
     if phase == "train":
         train_config = {
             "seed": 42,

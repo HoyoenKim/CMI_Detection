@@ -10,9 +10,6 @@ FEATURE_NAMES = [
     "minute_cos",
     "anglez_sin",
     "anglez_cos",
+    "anglez_diff",
+    "enmo_diff",
 ]
-
-ANGLEZ_MEAN = -8.810476
-ANGLEZ_STD = 35.521877
-ENMO_MEAN = 0.041315
-ENMO_STD = 0.101829

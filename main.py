@@ -34,23 +34,26 @@ if __name__ == "__main__":
             "distance": distance,
         }
         print(f"Post-process: distance with {distance} and score_th with {score_th}")
-            
+        feature_arg = sys.argv[14]
+        features = feature_arg.split(',')
+        print("Features: ", features)
+        epochs = int(sys.argv[15])    
     except:
         print(sys.argv)
         print("Please Type the boolean values")
     
-    config = gen_config(phase, env, dataset, feature_extractor, model, decoder, postprocess_config, num_workers, downsample_rate, batch_size, 50)
+    config = gen_config(phase, env, dataset, feature_extractor, model, decoder, postprocess_config, feature_arg, num_workers, downsample_rate, batch_size, epochs)
     if phase == "train":
         if do_preprocess == "1":
             # preprocess 
-            preprocess(config["dir"]["train_series_path"], config["dir"]["processed_dir"], env)
+            preprocess(config["dir"]["train_series_path"], config["dir"]["processed_dir"], phase, env)
         if do_main == "1":
             # train
             train(config)
     elif phase == "test": 
         if do_preprocess == "1":
             # preprocess 
-            preprocess(config["dir"]["test_series_path"], config["dir"]["processed_dir"], env)    
+            preprocess(config["dir"]["test_series_path"], config["dir"]["processed_dir"], phase, env)    
         if do_main == "1":
             # inference
             inference(config, config["dir"]["model_path"], config["dir"]["submission_path"])
