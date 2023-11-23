@@ -41,7 +41,7 @@ logging.basicConfig(
 )
 LOGGER = logging.getLogger(Path(__file__).name)
 
-def train(cfg):
+def train(cfg, env):
     seed_everything(cfg["seed"])
 
     # init lightning model
@@ -58,7 +58,10 @@ def train(cfg):
         save_last=False,
     )
     lr_monitor = LearningRateMonitor("epoch")
-    progress_bar = MyProgressBar()
+    if env == "colab":
+        progress_bar = MyProgressBar()
+    else:
+        progress_bar = RichProgressBar()
     model_summary = RichModelSummary(max_depth=2)
 
     # init experiment logger
@@ -92,7 +95,7 @@ def train(cfg):
     trainer.fit(model, datamodule=datamodule)
 
     # load best weights
-    model = model.load_from_checkpoint(
+    model = PLSleepModel.load_from_checkpoint(
         checkpoint_cb.best_model_path,
         cfg=cfg,
         val_event_df=datamodule.valid_event_df,

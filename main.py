@@ -49,7 +49,7 @@ if __name__ == "__main__":
             preprocess(config["dir"]["train_series_path"], config["dir"]["processed_dir"], phase, env)
         if do_main == "1":
             # train
-            train(config)
+            train(config, env)
     elif phase == "test": 
         if do_preprocess == "1":
             # preprocess 
