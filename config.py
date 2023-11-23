@@ -200,16 +200,16 @@ def gen_config(phase, env, dataset, feature_extractor, model, decoder, postproce
             "train_events_path": "/kaggle/input/child-mind-institute-detect-sleep-states/train_events.csv",
             "train_series_path": "/kaggle/input/child-mind-institute-detect-sleep-states/train_series.parquet",
             "test_series_path": "/kaggle/input/child-mind-institute-detect-sleep-states/test_series.parquet",
-            "model_path": f"/kaggle/cmi-best-model/best_model_{model_name_postfix}.pth",
-            "submission_path": "/kaggle/working/output/submission.csv",
+            "model_path": f"/kaggle/working/best_model_{model_name_postfix}.pth",
+            "submission_path": "/kaggle/working/submission.csv",
         }
         test_dir_config = {
             "processed_dir": "/kaggle/working/output_test",
             "train_events_path": "/kaggle/input/child-mind-institute-detect-sleep-states/train_events.csv",
             "train_series_path": "/kaggle/input/child-mind-institute-detect-sleep-states/train_series.parquet",
             "test_series_path": "/kaggle/input/child-mind-institute-detect-sleep-states/test_series.parquet",
-            "model_path": "/kaggle/cmi-best-model/best_model.pth",
-            "submission_path": "/kaggle/working/output/submission.csv",
+            "model_path": "/kaggle/input/cmi-best-model/best_model.pth",
+            "submission_path": "/kaggle/working/submission.csv",
         }
 
     dataset_config = None

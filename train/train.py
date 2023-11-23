@@ -1,4 +1,5 @@
 
+import sys
 import logging
 from pathlib import Path
 
@@ -9,12 +10,32 @@ from pytorch_lightning.callbacks import (
     ModelCheckpoint,
     RichModelSummary,
     RichProgressBar,
+    TQDMProgressBar
 )
 #from pytorch_lightning.loggers import WandbLogger
 
 from datamodule.datamodule import SleepDataModule
 from model.model import PLSleepModel
 
+class MyProgressBar(TQDMProgressBar):
+    def init_validation_tqdm(self):
+        bar = super().init_validation_tqdm()
+        if not sys.stdout.isatty():
+            bar.disable = True
+        return bar
+
+    def init_predict_tqdm(self):
+        bar = super().init_predict_tqdm()
+        if not sys.stdout.isatty():
+            bar.disable = True
+        return bar
+
+    def init_test_tqdm(self):
+        bar = super().init_test_tqdm()
+        if not sys.stdout.isatty():
+            bar.disable = True
+        return bar
+    
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s:%(name)s - %(message)s"
 )
@@ -37,7 +58,7 @@ def train(cfg):
         save_last=False,
     )
     lr_monitor = LearningRateMonitor("epoch")
-    progress_bar = RichProgressBar()
+    progress_bar = MyProgressBar()
     model_summary = RichModelSummary(max_depth=2)
 
     # init experiment logger
