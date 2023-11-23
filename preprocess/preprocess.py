@@ -127,10 +127,18 @@ def preprocess(train_series_path, train_series_save_dir, phase, env, save = True
     if save:
         if not os.path.isdir(train_series_save_dir):
             os.mkdir(train_series_save_dir)
-        for series_id, this_series_df in tqdm(series_df.group_by("series_id"), total=n_unique):
-            this_series_df = add_feature(this_series_df, FEATURE_NAMES)
-            this_series_save_path = os.path.join(train_series_save_dir, series_id)
-            if not os.path.isdir(this_series_save_path):
-                os.mkdir(this_series_save_path)
-            save_each_series(this_series_df, FEATURE_NAMES, this_series_save_path)
+        if env == "colab":
+            for series_id, this_series_df in tqdm(series_df.groupby("series_id"), total=n_unique):
+                this_series_df = add_feature(this_series_df, FEATURE_NAMES)
+                this_series_save_path = os.path.join(train_series_save_dir, series_id)
+                if not os.path.isdir(this_series_save_path):
+                    os.mkdir(this_series_save_path)
+                save_each_series(this_series_df, FEATURE_NAMES, this_series_save_path)
+        else:
+            for series_id, this_series_df in tqdm(series_df.group_by("series_id"), total=n_unique):
+                this_series_df = add_feature(this_series_df, FEATURE_NAMES)
+                this_series_save_path = os.path.join(train_series_save_dir, series_id)
+                if not os.path.isdir(this_series_save_path):
+                    os.mkdir(this_series_save_path)
+                save_each_series(this_series_df, FEATURE_NAMES, this_series_save_path)
 
