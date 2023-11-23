@@ -5,6 +5,8 @@ from train.train import train
 from inference.inference import inference
 from config import gen_config
 
+import torch
+
 if __name__ == "__main__":
     do_preprocess = False
     do_train = False
@@ -49,6 +51,8 @@ if __name__ == "__main__":
             preprocess(config["dir"]["train_series_path"], config["dir"]["processed_dir"], phase, env)
         if do_main == "1":
             # train
+            if env == "colab":
+                torch.set_float32_matmul_precision('high')
             train(config, env)
     elif phase == "test": 
         if do_preprocess == "1":
