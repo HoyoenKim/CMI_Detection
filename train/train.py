@@ -12,6 +12,7 @@ from pytorch_lightning.callbacks import (
     TQDMProgressBar
 )
 import numpy as np
+from tqdm import tqdm
 #from pytorch_lightning.loggers import WandbLogger
 
 from datamodule.datamodule import SleepDataModule
@@ -151,7 +152,7 @@ def train2(cfg):
     optimizer = torch.optim.AdamW(model.model.parameters(), lr=cfg["optimizer"]["lr"])
     criterion = model.model.loss_fn
     best_val_loss = float('inf')
-    for epoch in range(cfg["trainer"]['epochs']):
+    for epoch in tqdm(range(cfg["trainer"]['epochs'])):
         train_loss = do_train(model, datamodule.train_dataloader(), optimizer, criterion, device, cfg)
         val_loss = do_validate(model, datamodule.val_dataloader(), criterion, device, cfg)
 
