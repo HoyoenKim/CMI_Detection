@@ -112,13 +112,16 @@ def train(cfg, env):
 def do_train(model, dataloader, optimizer, criterion, device, cfg):
     model.train()
     total_loss = 0
-    for batch in tqdm(dataloader):
+    for i, batch in tqdm(enumerate(dataloader), total=len(dataloader)):
         inputs, labels = batch['feature'].to(device), batch['label'].to(device)
 
         optimizer.zero_grad()
         do_mixup = np.random.rand() < cfg["aug"]["mixup_prob"]
         do_cutmix = np.random.rand() < cfg["aug"]["cutmix_prob"]
         outputs = model(inputs, labels, do_mixup, do_cutmix)
+        print(outputs)
+        print(outputs.logits)
+        print(type(outputs.logits))
         loss = criterion(outputs.logits, labels)
         loss.backward()
         optimizer.step()
@@ -130,11 +133,14 @@ def do_validate(model, dataloader, criterion, device, cfg):
     model.eval()
     total_loss = 0
     with torch.no_grad():
-        for batch in tqdm(dataloader):
+        for i, batch in tqdm(enumerate(dataloader), total=len(dataloader)):
             inputs, labels = batch['feature'].to(device), batch['label'].to(device)
             do_mixup = np.random.rand() < cfg["aug"]["mixup_prob"]
             do_cutmix = np.random.rand() < cfg["aug"]["cutmix_prob"]
             outputs = model(inputs, labels, do_mixup, do_cutmix)
+            print(outputs)
+            print(outputs.logits)
+            print(type(outputs.logits))
             loss = criterion(outputs.logits, labels)
             total_loss += loss.item()
     return total_loss / len(dataloader)
