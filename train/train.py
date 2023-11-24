@@ -118,7 +118,7 @@ def do_train(model, dataloader, optimizer, criterion, device, cfg):
         do_mixup = np.random.rand() < cfg["aug"]["mixup_prob"]
         do_cutmix = np.random.rand() < cfg["aug"]["cutmix_prob"]
         outputs = model(inputs, labels, do_mixup, do_cutmix)
-        loss = criterion(outputs, labels)
+        loss = criterion(outputs.logits, labels)
         loss.backward()
         optimizer.step()
 
