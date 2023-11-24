@@ -105,3 +105,55 @@ def train(cfg, env):
     weights_path = cfg["dir"]["model_path"]  # type: ignore
     LOGGER.info(f"Extracting and saving best weights: {weights_path}")
     torch.save(model.model.state_dict(), weights_path)
+
+
+def do_train(model, dataloader, optimizer, criterion, device):
+    model.train()
+    total_loss = 0
+    for batch in dataloader:
+        inputs, labels = batch['feature'].to(device), batch['label'].to(device)
+
+        optimizer.zero_grad()
+        outputs = model(inputs)
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
+
+        total_loss += loss.item()
+    return total_loss / len(dataloader)
+
+def do_validate(model, dataloader, criterion, device):
+    model.eval()
+    total_loss = 0
+    with torch.no_grad():
+        for batch in dataloader:
+            inputs, labels = batch['feature'].to(device), batch['label'].to(device)
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            total_loss += loss.item()
+    return total_loss / len(dataloader)
+
+def train2(cfg):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    # 데이터 모듈 초기화
+    datamodule = SleepDataModule(cfg)
+
+    # 모델 초기화
+    model = PLSleepModel(cfg, datamodule.valid_event_df, len(cfg["features"]), len(cfg["labels"]), cfg["duration"]).to(device)
+
+    # 옵티마이저 및 손실 함수 설정
+    optimizer = torch.optim.AdamW(model.model.parameters(), lr=cfg["optimizer"]["lr"])
+    criterion = model.model.loss_fn
+    best_val_loss = float('inf')
+    for epoch in range(cfg['epochs']):
+        train_loss = do_train(model, datamodule.train_dataloader, optimizer, criterion, device)
+        val_loss = do_validate(model, datamodule.val_dataloader, criterion, device)
+
+        print(f"Epoch {epoch}, Train Loss: {train_loss}, Validation Loss: {val_loss}")
+
+        # 검증 손실이 개선되었는지 확인하고 모델 저장
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            weights_path = cfg["dir"]["model_path"]
+            torch.save(model.model.state_dict(), weights_path)

@@ -1,7 +1,7 @@
 import sys
 
 from preprocess.preprocess import preprocess
-from train.train import train
+from train.train import train, train2
 from inference.inference import inference
 from config import gen_config
 
@@ -53,7 +53,11 @@ if __name__ == "__main__":
             # train
             if env == "colab":
                 torch.set_float32_matmul_precision('high')
-            train(config, env)
+            
+            if model == "detr":
+                train2(config)
+            else:
+                train(config, env)
     elif phase == "test": 
         if do_preprocess == "1":
             # preprocess 
