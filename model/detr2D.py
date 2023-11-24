@@ -114,8 +114,7 @@ class DETRLoss(nn.Module):
         self.bce = nn.BCEWithLogitsLoss()
         self.reg_loss = nn.GaussianNLLLoss(reduction="none")
 
-    def forward(self, model_output: torch.Tensor, labels: torch.Tensor):
-        logits = model_output.logits
+    def forward(self, logits: torch.Tensor, labels: torch.Tensor):
         indices = self.matcher(logits[:, :, [0, 1, 3]], labels)
 
         loss_boxes = self.loss_boxes(logits, labels, indices)
