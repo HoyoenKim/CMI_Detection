@@ -99,11 +99,12 @@ class CenterNet(BaseModel):
         self.decoder = decoder
         self.mixup = Mixup(mixup_alpha)
         self.cutmix = Cutmix(cutmix_alpha)
-        self.loss_fn = CenterNetLoss(
-            keypoint_weight=keypoint_weight,
-            offset_weight=offset_weight,
-            bbox_size_weight=bbox_size_weight,
-        )
+        #self.loss_fn = CenterNetLoss(
+        #    keypoint_weight=keypoint_weight,
+        #    offset_weight=offset_weight,
+        #    bbox_size_weight=bbox_size_weight,
+        #)
+        self.loss_fn = nn.BCEWithLogitsLoss()
 
     def _forward(
         self,

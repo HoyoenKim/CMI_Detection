@@ -240,7 +240,8 @@ class DETR2DCNN(BaseModel):
         )
         self.mixup = Mixup(mixup_alpha)
         self.cutmix = Cutmix(cutmix_alpha)
-        self.loss_fn = DETRLoss(HungarianMatcher())
+        #self.loss_fn = DETRLoss(HungarianMatcher())
+        self.loss_fn = nn.BCEWithLogitsLoss()
 
     def _forward(
         self,
