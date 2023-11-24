@@ -146,7 +146,7 @@ def train2(cfg):
     optimizer = torch.optim.AdamW(model.model.parameters(), lr=cfg["optimizer"]["lr"])
     criterion = model.model.loss_fn
     best_val_loss = float('inf')
-    for epoch in range(cfg['epochs']):
+    for epoch in range(cfg["trainer"]['epochs']):
         train_loss = do_train(model, datamodule.train_dataloader, optimizer, criterion, device)
         val_loss = do_validate(model, datamodule.val_dataloader, criterion, device)
 
