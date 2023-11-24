@@ -11,6 +11,7 @@ from pytorch_lightning.callbacks import (
     RichProgressBar,
     TQDMProgressBar
 )
+import numpy as np
 #from pytorch_lightning.loggers import WandbLogger
 
 from datamodule.datamodule import SleepDataModule
@@ -107,14 +108,16 @@ def train(cfg, env):
     torch.save(model.model.state_dict(), weights_path)
 
 
-def do_train(model, dataloader, optimizer, criterion, device):
+def do_train(model, dataloader, optimizer, criterion, device, cfg):
     model.train()
     total_loss = 0
     for batch in dataloader:
         inputs, labels = batch['feature'].to(device), batch['label'].to(device)
 
         optimizer.zero_grad()
-        outputs = model(inputs)
+        do_mixup = np.random.rand() < cfg["aug"]["mixup_prob"]
+        do_cutmix = np.random.rand() < cfg["aug"]["cutmix_prob"]
+        outputs = model(inputs, labels, do_mixup, do_cutmix)
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
@@ -122,13 +125,15 @@ def do_train(model, dataloader, optimizer, criterion, device):
         total_loss += loss.item()
     return total_loss / len(dataloader)
 
-def do_validate(model, dataloader, criterion, device):
+def do_validate(model, dataloader, criterion, device, cfg):
     model.eval()
     total_loss = 0
     with torch.no_grad():
         for batch in dataloader:
             inputs, labels = batch['feature'].to(device), batch['label'].to(device)
-            outputs = model(inputs)
+            do_mixup = np.random.rand() < cfg["aug"]["mixup_prob"]
+            do_cutmix = np.random.rand() < cfg["aug"]["cutmix_prob"]
+            outputs = model(inputs, labels, do_mixup, do_cutmix)
             loss = criterion(outputs, labels)
             total_loss += loss.item()
     return total_loss / len(dataloader)
@@ -147,8 +152,8 @@ def train2(cfg):
     criterion = model.model.loss_fn
     best_val_loss = float('inf')
     for epoch in range(cfg["trainer"]['epochs']):
-        train_loss = do_train(model, datamodule.train_dataloader(), optimizer, criterion, device)
-        val_loss = do_validate(model, datamodule.val_dataloader(), criterion, device)
+        train_loss = do_train(model, datamodule.train_dataloader(), optimizer, criterion, device, cfg)
+        val_loss = do_validate(model, datamodule.val_dataloader(), criterion, device, cfg)
 
         print(f"Epoch {epoch}, Train Loss: {train_loss}, Validation Loss: {val_loss}")
 
