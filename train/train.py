@@ -119,10 +119,7 @@ def do_train(model, dataloader, optimizer, criterion, device, cfg):
         do_mixup = np.random.rand() < cfg["aug"]["mixup_prob"]
         do_cutmix = np.random.rand() < cfg["aug"]["cutmix_prob"]
         outputs = model(inputs, labels, do_mixup, do_cutmix)
-        print(outputs)
-        print(outputs.logits)
-        print(type(outputs.logits))
-        loss = criterion(outputs.logits, labels)
+        loss = outputs.loss
         loss.backward()
         optimizer.step()
 
@@ -138,10 +135,7 @@ def do_validate(model, dataloader, criterion, device, cfg):
             do_mixup = np.random.rand() < cfg["aug"]["mixup_prob"]
             do_cutmix = np.random.rand() < cfg["aug"]["cutmix_prob"]
             outputs = model(inputs, labels, do_mixup, do_cutmix)
-            print(outputs)
-            print(outputs.logits)
-            print(type(outputs.logits))
-            loss = criterion(outputs.logits, labels)
+            loss = outputs.loss
             total_loss += loss.item()
     return total_loss / len(dataloader)
 
