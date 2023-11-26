@@ -205,5 +205,6 @@ def train2(cfg):
         # 검증 손실이 개선되었는지 확인하고 모델 저장
         if score < best_val_score:
             best_val_score = score
+            print("save model with best_val_score: ", score)
             weights_path = cfg["dir"]["model_path"]
             torch.save(model.model.state_dict(), weights_path)
