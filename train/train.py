@@ -114,7 +114,7 @@ def train(cfg, env):
 def do_train(model, dataloader, optimizer, device, cfg):
     model.train()
     total_loss = 0
-    for i, batch in tqdm(enumerate(dataloader), total=len(dataloader)):
+    for i, batch in enumerate(dataloader):
         inputs, labels = batch['feature'].to(device), batch['label'].to(device)
 
         optimizer.zero_grad()
@@ -139,7 +139,7 @@ def do_validate(model, dataloader, device, cfg):
     validation_step_outputs = []
 
     with torch.no_grad():
-        for i, batch in tqdm(enumerate(dataloader), total=len(dataloader)):
+        for i, batch in enumerate(dataloader):
             inputs, labels = batch['feature'].to(device), batch['label'].to(device)
             
             # Predict the outputs using the duration parameter
