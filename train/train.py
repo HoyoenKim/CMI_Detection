@@ -17,6 +17,8 @@ from tqdm import tqdm
 
 from datamodule.datamodule import SleepDataModule
 from model.model import PLSleepModel
+from common.metric import event_detection_ap
+from common.postprocess import post_process_for_seg
 
 class MyProgressBar(TQDMProgressBar):
     def init_validation_tqdm(self):
@@ -109,7 +111,7 @@ def train(cfg, env):
     torch.save(model.model.state_dict(), weights_path)
 
 
-def do_train(model, dataloader, optimizer, criterion, device, cfg):
+def do_train(model, dataloader, optimizer, device, cfg):
     model.train()
     total_loss = 0
     for i, batch in tqdm(enumerate(dataloader), total=len(dataloader)):
@@ -119,27 +121,51 @@ def do_train(model, dataloader, optimizer, criterion, device, cfg):
         do_mixup = np.random.rand() < cfg["aug"]["mixup_prob"]
         do_cutmix = np.random.rand() < cfg["aug"]["cutmix_prob"]
         outputs = model(inputs, labels, do_mixup, do_cutmix)
-        print(outputs.loss)
         loss = outputs.loss
         loss.backward()
         optimizer.step()
 
         total_loss += loss.item()
-    return total_loss / len(dataloader)
+    
+    # Calculate the average loss
+    average_loss = total_loss / len(dataloader)
+    print("Training loss", average_loss)
 
-def do_validate(model, dataloader, criterion, device, cfg):
+    return average_loss
+
+def do_validate(model, dataloader, device, cfg):
     model.eval()
     total_loss = 0
+    validation_step_outputs = []
+
     with torch.no_grad():
         for i, batch in tqdm(enumerate(dataloader), total=len(dataloader)):
             inputs, labels = batch['feature'].to(device), batch['label'].to(device)
-            do_mixup = np.random.rand() < cfg["aug"]["mixup_prob"]
-            do_cutmix = np.random.rand() < cfg["aug"]["cutmix_prob"]
-            outputs = model(inputs, labels, do_mixup, do_cutmix)
-            loss = outputs.loss
-            print(outputs.loss)
-            total_loss += loss.item()
-    return total_loss / len(dataloader)
+            
+            # Predict the outputs using the duration parameter
+            outputs = model.predict(inputs, cfg["duration"], labels)
+
+            # Detach and move the loss to CPU
+            loss_value = outputs.loss.detach().item()
+            total_loss += loss_value
+
+            # Optionally log or print loss here
+
+            # Append to validation_step_outputs
+            validation_step_outputs.append(
+                (
+                    batch.get("key", None),  # Assuming 'key' is optional
+                    outputs.labels.detach().cpu().numpy(),
+                    outputs.preds.detach().cpu().numpy(),
+                    loss_value,
+                )
+            )
+
+    # Calculate the average loss
+    average_loss = total_loss / len(dataloader)
+    print("Validation loss", average_loss)
+
+    return average_loss, validation_step_outputs
 
 def train2(cfg):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -152,13 +178,29 @@ def train2(cfg):
 
     # 옵티마이저 및 손실 함수 설정
     optimizer = torch.optim.AdamW(model.model.parameters(), lr=cfg["optimizer"]["lr"])
-    criterion = model.model.loss_fn
     best_val_loss = float('inf')
     for epoch in tqdm(range(cfg["trainer"]['epochs'])):
-        train_loss = do_train(model, datamodule.train_dataloader(), optimizer, criterion, device, cfg)
-        val_loss = do_validate(model, datamodule.val_dataloader(), criterion, device, cfg)
+        train_loss = do_train(model, datamodule.train_dataloader(), optimizer, device, cfg)
+        val_loss, validation_step_outputs = do_validate(model, datamodule.val_dataloader(), device, cfg)
 
         print(f"Epoch {epoch}, Train Loss: {train_loss}, Validation Loss: {val_loss}")
+
+        keys = []
+        for x in validation_step_outputs:
+            keys.extend(x[0])
+        labels = np.concatenate([x[1] for x in validation_step_outputs])
+        preds = np.concatenate([x[2] for x in validation_step_outputs])
+        losses = np.array([x[3] for x in validation_step_outputs])
+        loss = losses.mean()
+
+        val_pred_df = post_process_for_seg(
+            keys=keys,
+            preds=preds,
+            score_th=cfg["pp"]["score_th"],
+            distance=cfg["pp"]["distance"],
+        )
+        score = event_detection_ap(model.val_event_df.to_pandas(), val_pred_df.to_pandas())
+        print("val_score: ", score,)
 
         # 검증 손실이 개선되었는지 확인하고 모델 저장
         if val_loss < best_val_loss:
