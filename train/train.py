@@ -143,7 +143,7 @@ def do_validate(model, dataloader, device, cfg):
             inputs, labels = batch['feature'].to(device), batch['label'].to(device)
             
             # Predict the outputs using the duration parameter
-            outputs = model.predict(inputs, cfg["duration"], labels)
+            outputs = model.model.predict(inputs, cfg["duration"], labels)
 
             # Detach and move the loss to CPU
             loss_value = outputs.loss.detach().item()
