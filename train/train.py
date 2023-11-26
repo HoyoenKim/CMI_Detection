@@ -178,7 +178,7 @@ def train2(cfg):
 
     # 옵티마이저 및 손실 함수 설정
     optimizer = torch.optim.AdamW(model.model.parameters(), lr=cfg["optimizer"]["lr"])
-    best_val_loss = float('inf')
+    best_val_score = float('inf')
     for epoch in tqdm(range(cfg["trainer"]['epochs'])):
         train_loss = do_train(model, datamodule.train_dataloader(), optimizer, device, cfg)
         val_loss, validation_step_outputs = do_validate(model, datamodule.val_dataloader(), device, cfg)
@@ -200,10 +200,10 @@ def train2(cfg):
             distance=cfg["pp"]["distance"],
         )
         score = event_detection_ap(model.val_event_df.to_pandas(), val_pred_df.to_pandas())
-        print("val_score: ", score,)
+        print("val_score: ", score)
 
         # 검증 손실이 개선되었는지 확인하고 모델 저장
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
+        if score < best_val_score:
+            best_val_score = score
             weights_path = cfg["dir"]["model_path"]
             torch.save(model.model.state_dict(), weights_path)
