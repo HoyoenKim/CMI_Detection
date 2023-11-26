@@ -54,7 +54,7 @@ if __name__ == "__main__":
             if env == "colab":
                 torch.set_float32_matmul_precision('high')
             
-            if model == "DETR2DCNN":
+            if model == "DETR2DCNN" or model == "CenterNet":
                 print("Other train fn")
                 train2(config)
             else:
