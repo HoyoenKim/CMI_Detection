@@ -76,7 +76,7 @@ class Spec2DCNN(BaseModel):
         do_cutmix: bool = False,
     ) -> torch.Tensor | tuple[torch.Tensor, torch.Tensor]:
         x = self.feature_extractor(x)  # (batch_size, n_channels, height, n_timesteps)
-        #plot_feature_extractor_output(x, 0, 0)
+        plot_feature_extractor_output(x, 0, 0)
 
         if do_mixup and labels is not None:
             x, labels = self.mixup(x, labels)
@@ -84,10 +84,10 @@ class Spec2DCNN(BaseModel):
             x, labels = self.cutmix(x, labels)
 
         x = self.encoder(x).squeeze(1)  # (batch_size, height, n_timesteps)
-        #plot_encoder_output(x, 0)
+        plot_encoder_output(x, 0)
 
         logits = self.decoder(x)  # (batch_size, n_timesteps, n_classes)
-        #plot_decoder_output(logits, 0)
+        plot_decoder_output(logits, 0)
 
         if labels is not None:
             return logits, labels
