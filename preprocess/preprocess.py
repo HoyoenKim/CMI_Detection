@@ -29,8 +29,8 @@ def cal_const(series_lf):
     series_df = series_lf.with_columns([
         pl.col('anglez'),
         pl.col('enmo'),
-        ((pl.col('anglez') - pl.col('anglez').shift(1)).fill_nan(0)).alias('anglez_diff'),
-        ((pl.col('enmo') - pl.col('enmo').shift(1)).fill_nan(0)).alias('enmo_diff')
+        ((pl.col('anglez') - pl.col('anglez').shift(1)).fill_nan(0)).abs().alias('anglez_diff'),
+        ((pl.col('enmo') - pl.col('enmo').shift(1)).fill_nan(0)).abs().alias('enmo_diff')
     ]).collect(streaming=True)
 
     # Calculate mean and standard deviation for the differences
