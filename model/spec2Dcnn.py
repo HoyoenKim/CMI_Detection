@@ -9,6 +9,40 @@ from common.cutmix import Cutmix
 from common.mixup import Mixup
 from model.base import BaseModel
 
+import matplotlib.pyplot as plt
+
+def plot_feature_extractor_output(x, batch_idx=0, channel_idx=0):
+    # Select the specific batch and channel
+    data = x[batch_idx, channel_idx, :, :].detach().cpu().numpy()
+
+    plt.imshow(data, aspect='auto')
+    plt.title(f"Feature Extractor Output - Batch {batch_idx}, Channel {channel_idx}")
+    plt.xlabel("Time")
+    plt.ylabel("Features")
+    plt.colorbar()
+    plt.show()
+
+def plot_encoder_output(x, batch_idx=0):
+    # Select the specific batch
+    data = x[batch_idx, :, :].detach().cpu().numpy()
+
+    plt.imshow(data, aspect='auto')
+    plt.title(f"Encoder Output - Batch {batch_idx}")
+    plt.xlabel("Time")
+    plt.ylabel("Encoded Features")
+    plt.colorbar()
+    plt.show()
+
+def plot_decoder_output(logits, batch_idx=0):
+    # Select the specific batch
+    data = logits[batch_idx, :, :].detach().cpu().numpy()
+
+    plt.imshow(data.T, aspect='auto')  # Transpose to have classes on y-axis
+    plt.title(f"Decoder Output - Batch {batch_idx}")
+    plt.xlabel("Time")
+    plt.ylabel("Classes")
+    plt.colorbar()
+    plt.show()
 
 class Spec2DCNN(BaseModel):
     def __init__(
@@ -42,6 +76,7 @@ class Spec2DCNN(BaseModel):
         do_cutmix: bool = False,
     ) -> torch.Tensor | tuple[torch.Tensor, torch.Tensor]:
         x = self.feature_extractor(x)  # (batch_size, n_channels, height, n_timesteps)
+        #plot_feature_extractor_output(x, 0, 0)
 
         if do_mixup and labels is not None:
             x, labels = self.mixup(x, labels)
@@ -49,7 +84,10 @@ class Spec2DCNN(BaseModel):
             x, labels = self.cutmix(x, labels)
 
         x = self.encoder(x).squeeze(1)  # (batch_size, height, n_timesteps)
+        #plot_encoder_output(x, 0)
+
         logits = self.decoder(x)  # (batch_size, n_timesteps, n_classes)
+        #plot_decoder_output(logits, 0)
 
         if labels is not None:
             return logits, labels
