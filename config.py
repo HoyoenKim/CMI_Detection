@@ -61,7 +61,8 @@ def gen_config(phase, env, dataset, feature_extractor, model, decoder, postproce
       "params": {
         "hidden_size": 64,
         "num_layers": 2,
-        "bidirectional": True
+        "bidirectional": True,
+        "stride": downsample_rate
       }
     }
     Spec = {
