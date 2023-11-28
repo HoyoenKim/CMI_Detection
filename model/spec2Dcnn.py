@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 
 import segmentation_models_pytorch as smp
@@ -11,7 +12,7 @@ from model.base import BaseModel
 
 import matplotlib.pyplot as plt
 
-def plot_feature_extractor_output(x, batch_idx=0, channel_idx=0, filename="./feature_extractor_output.png"):
+def plot_feature_extractor_output(x, batch_idx=0, channel_idx=0, filename="feature_extractor_output.png"):
     # Select the specific batch and channel
     data = x[batch_idx, channel_idx, :, :].detach().cpu().numpy()
 
@@ -20,10 +21,10 @@ def plot_feature_extractor_output(x, batch_idx=0, channel_idx=0, filename="./fea
     plt.xlabel("Time")
     plt.ylabel("Features")
     plt.colorbar()
-    plt.savefig(filename)  # Save the image
+    plt.savefig(os.path.join('./images', f'{batch_idx}_{channel_idx}_{filename}'))  # Save the image
     plt.clf()  # Clear the figure
 
-def plot_encoder_output(x, batch_idx=0, filename="./encoder_output.png"):
+def plot_encoder_output(x, batch_idx=0, filename="encoder_output.png"):
     # Select the specific batch
     data = x[batch_idx, :, :].detach().cpu().numpy()
 
@@ -32,10 +33,10 @@ def plot_encoder_output(x, batch_idx=0, filename="./encoder_output.png"):
     plt.xlabel("Time")
     plt.ylabel("Encoded Features")
     plt.colorbar()
-    plt.savefig(filename)  # Save the image
+    plt.savefig(os.path.join('./images', f'{batch_idx}_{filename}'))  # Save the image
     plt.clf()  # Clear the figure
 
-def plot_decoder_output(logits, batch_idx=0, filename="./decoder_output.png"):
+def plot_decoder_output(logits, batch_idx=0, filename="decoder_output.png"):
     # Select the specific batch
     data = logits[batch_idx, :, :].detach().cpu().numpy()
 
@@ -44,7 +45,7 @@ def plot_decoder_output(logits, batch_idx=0, filename="./decoder_output.png"):
     plt.xlabel("Time")
     plt.ylabel("Classes")
     plt.colorbar()
-    plt.savefig(filename)  # Save the image
+    plt.savefig(os.path.join('./images', f'{batch_idx}_{filename}'))  # Save the image
     plt.clf()  # Clear the figure
 
 class Spec2DCNN(BaseModel):
@@ -79,7 +80,7 @@ class Spec2DCNN(BaseModel):
         do_cutmix: bool = False,
     ) -> torch.Tensor | tuple[torch.Tensor, torch.Tensor]:
         x = self.feature_extractor(x)  # (batch_size, n_channels, height, n_timesteps)
-        plot_feature_extractor_output(x, 0, 0)
+        #plot_feature_extractor_output(x, 0, 0)
 
         if do_mixup and labels is not None:
             x, labels = self.mixup(x, labels)
@@ -87,10 +88,10 @@ class Spec2DCNN(BaseModel):
             x, labels = self.cutmix(x, labels)
 
         x = self.encoder(x).squeeze(1)  # (batch_size, height, n_timesteps)
-        plot_encoder_output(x, 0)
+        #plot_encoder_output(x, 0)
 
         logits = self.decoder(x)  # (batch_size, n_timesteps, n_classes)
-        plot_decoder_output(logits, 0)
+        #plot_decoder_output(logits, 0)
 
         if labels is not None:
             return logits, labels
