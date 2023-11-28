@@ -11,7 +11,7 @@ from model.base import BaseModel
 
 import matplotlib.pyplot as plt
 
-def plot_feature_extractor_output(x, batch_idx=0, channel_idx=0):
+def plot_feature_extractor_output(x, batch_idx=0, channel_idx=0, filename="./feature_extractor_output.png"):
     # Select the specific batch and channel
     data = x[batch_idx, channel_idx, :, :].detach().cpu().numpy()
 
@@ -20,9 +20,10 @@ def plot_feature_extractor_output(x, batch_idx=0, channel_idx=0):
     plt.xlabel("Time")
     plt.ylabel("Features")
     plt.colorbar()
-    plt.show()
+    plt.savefig(filename)  # Save the image
+    plt.clf()  # Clear the figure
 
-def plot_encoder_output(x, batch_idx=0):
+def plot_encoder_output(x, batch_idx=0, filename="./encoder_output.png"):
     # Select the specific batch
     data = x[batch_idx, :, :].detach().cpu().numpy()
 
@@ -31,9 +32,10 @@ def plot_encoder_output(x, batch_idx=0):
     plt.xlabel("Time")
     plt.ylabel("Encoded Features")
     plt.colorbar()
-    plt.show()
+    plt.savefig(filename)  # Save the image
+    plt.clf()  # Clear the figure
 
-def plot_decoder_output(logits, batch_idx=0):
+def plot_decoder_output(logits, batch_idx=0, filename="./decoder_output.png"):
     # Select the specific batch
     data = logits[batch_idx, :, :].detach().cpu().numpy()
 
@@ -42,7 +44,8 @@ def plot_decoder_output(logits, batch_idx=0):
     plt.xlabel("Time")
     plt.ylabel("Classes")
     plt.colorbar()
-    plt.show()
+    plt.savefig(filename)  # Save the image
+    plt.clf()  # Clear the figure
 
 class Spec2DCNN(BaseModel):
     def __init__(
