@@ -108,7 +108,7 @@ def gen_config(phase, env, dataset, feature_extractor, model, decoder, postproce
       }
     }
     TransformerAutoModel = {
-      "name": "CenterNet",
+      "name": "TransformerAutoModel",
       "params": {
         "model_name": "microsoft/deberta-v3-small",
         "hidden_size": 120,
