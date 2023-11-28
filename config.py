@@ -1,6 +1,6 @@
-from const import train_series_ids, valid_series_ids
+from const import train_series_ids, valid_series_ids, new_train_series_ids, new_valid_series_ids
 
-def gen_config(phase, env, dataset, feature_extractor, model, decoder, postprocess_config, feature_arg, num_workers = 2, downsample_rate = 2, batch_size = 32, epochs = 50):
+def gen_config(phase, env, dataset, feature_extractor, model, decoder, postprocess_config, feature_arg, num_workers = 2, downsample_rate = 2, batch_size = 32, epochs = 50, series_ids = 0):
     # Dataset
     seg = {
       "name": "seg",
@@ -161,10 +161,19 @@ def gen_config(phase, env, dataset, feature_extractor, model, decoder, postproce
       }
     }
     # Common
-    split_config = {
-        "train_series_ids": train_series_ids,
-        "valid_series_ids": valid_series_ids
-    }
+    if(series_ids == 1):
+      print("use new series ids")
+      split_config = {
+          "train_series_ids": new_train_series_ids,
+          "valid_series_ids": new_valid_series_ids
+      } 
+    else:
+      print("use old series ids")
+      split_config = {
+          "train_series_ids": train_series_ids,
+          "valid_series_ids": valid_series_ids
+      } 
+    
     aug_config = {
         "mixup_prob": 0.0,
         "mixup_alpha": 0.4,

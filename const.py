@@ -279,7 +279,7 @@ valid_series_ids =[
   "fbf33b1a2c10",
 ]
 
-valid_series_ids =[
+new_valid_series_ids =[
 "038441c925bb",
 "10469f6765bf",
 "207eded97727",
@@ -297,7 +297,7 @@ valid_series_ids =[
 "e0686434d029",
 "f0482490923c",
 ]
-train_series_ids = [
+new_train_series_ids = [
   
 "03d92c9f6f8a",
 "0402a003dae9",

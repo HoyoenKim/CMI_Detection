@@ -39,12 +39,17 @@ if __name__ == "__main__":
         feature_arg = sys.argv[14]
         features = feature_arg.split(',')
         print("Features: ", features)
-        epochs = int(sys.argv[15])    
+        epochs = int(sys.argv[15])
+
+        if len(sys.argv) == 16:
+            series_id_new = 0
+        else:
+            series_id_new = 1
     except:
         print(sys.argv)
         print("Please Type the boolean values")
     
-    config = gen_config(phase, env, dataset, feature_extractor, model, decoder, postprocess_config, feature_arg, num_workers, downsample_rate, batch_size, epochs)
+    config = gen_config(phase, env, dataset, feature_extractor, model, decoder, postprocess_config, feature_arg, num_workers, downsample_rate, batch_size, epochs, series_id_new)
     if phase == "train":
         if do_preprocess == "1":
             # preprocess 
