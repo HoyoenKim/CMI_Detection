@@ -106,6 +106,14 @@ def gen_config(phase, env, dataset, feature_extractor, model, decoder, postproce
         "bbox_size_weight": 1
       }
     }
+    TransformerAutoModel = {
+      "name": "CenterNet",
+      "params": {
+        "model_name": "microsoft/deberta-v3-small",
+        "hidden_size": 120,
+        "stride": downsample_rate,
+      }
+    }
     # Decoder
     UNet1DDecoder = {
       "name": "UNet1DDecoder",
@@ -135,9 +143,21 @@ def gen_config(phase, env, dataset, feature_extractor, model, decoder, postproce
         "dropout": 0.2
       }
     }
+    TransformerCNNDecoder = {
+      "name": "TransformerCNNDecoder",
+      "params": {
+        "hidden_size": 256,
+        "num_layers": 4,
+        "nhead": 4,
+        "dropout": 0.2
+      }
+    }
     MLPDecoder = {
       "name": "MLPDecoder",
-      "params": None
+      "params": {
+          "hidden_size": 128,
+          "num_layers": 3,
+      }
     }
     # Common
     split_config = {
@@ -239,6 +259,8 @@ def gen_config(phase, env, dataset, feature_extractor, model, decoder, postproce
         model_config = DETR2DCNN
     elif model == "CenterNet":
         model_config = CenterNet
+    elif model == "TransformerAutoModel":
+        model_config = TransformerAutoModel
     
     decoder_config = None
     if decoder == "UNet1DDecoder":
@@ -249,6 +271,8 @@ def gen_config(phase, env, dataset, feature_extractor, model, decoder, postproce
         decoder_config = TransformerDecoder
     elif decoder == "MLPDecoder":
         decoder_config = MLPDecoder
+    elif decoder == "TransformerCNNDecoder":
+        decoder_config = TransformerCNNDecoder
 
     features = feature_arg.split(',')
     if phase == "train":
