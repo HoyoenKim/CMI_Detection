@@ -126,7 +126,7 @@ class QLSTM(nn.Module):
         return hidden_seq, (h_t, c_t)
 
 
-class LSTMFeatureExtractor(nn.Module):
+class QLSTMFeatureExtractor(nn.Module):
     def __init__(
         self,
         in_channels: int,

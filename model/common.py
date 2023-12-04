@@ -2,10 +2,11 @@ from typing import Union
 
 import torch.nn as nn
 
+from model.feature_extractor.spectrogram import SpecFeatureExtractor
 from model.feature_extractor.cnn import CNNSpectrogram
 from model.feature_extractor.panns import PANNsFeatureExtractor
 from model.feature_extractor.lstm import LSTMFeatureExtractor
-from model.feature_extractor.spectrogram import SpecFeatureExtractor
+from model.feature_extractor.qlstm import QLSTMFeatureExtractor
 
 from model.decoder.unet1ddecoder import UNet1DDecoder
 from model.decoder.lstmdecoder import LSTMDecoder
@@ -21,7 +22,11 @@ from model.transformerautomodel import TransformerAutoModel
 
 def get_feature_extractor(cfg, feature_dim, num_timesteps):
     feature_extractor = None
-    if cfg["name"] == "CNNSpectrogram":
+    if cfg["name"] == "SpecFeatureExtractor":
+        feature_extractor = SpecFeatureExtractor(
+            in_channels=feature_dim, out_size=num_timesteps, **cfg["params"]
+        )
+    elif cfg["name"] == "CNNSpectrogram":
         feature_extractor = CNNSpectrogram(
             in_channels=feature_dim, output_size=num_timesteps, **cfg["params"]
         )
@@ -33,8 +38,8 @@ def get_feature_extractor(cfg, feature_dim, num_timesteps):
         feature_extractor = LSTMFeatureExtractor(
             in_channels=feature_dim, out_size=num_timesteps, **cfg["params"]
         )
-    elif cfg["name"] == "SpecFeatureExtractor":
-        feature_extractor = SpecFeatureExtractor(
+    elif cfg["name"] == "QLSTMFeatureExtractor":
+        feature_extractor = QLSTMFeatureExtractor(
             in_channels=feature_dim, out_size=num_timesteps, **cfg["params"]
         )
     else:

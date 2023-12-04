@@ -65,6 +65,15 @@ def gen_config(phase, env, dataset, feature_extractor, model, decoder, postproce
         "stride": downsample_rate
       }
     }
+    QLSTM = {
+      "name": "QLSTMFeatureExtractor",
+      "params": {
+        "hidden_size": 64,
+        "num_layers": 2,
+        "bidirectional": True,
+        "stride": downsample_rate
+      }
+    }
     Spec = {
       "name": "SpecFeatureExtractor",
       "params": {
@@ -251,14 +260,16 @@ def gen_config(phase, env, dataset, feature_extractor, model, decoder, postproce
         dataset_config = centernet
 
     feature_extractor_config = None
-    if feature_extractor == "CNN":
+    if feature_extractor == "Spec":
+        feature_extractor_config = Spec
+    elif feature_extractor == "CNN":
         feature_extractor_config = CNN
     elif feature_extractor == "PANNs":
         feature_extractor_config = PANNs
     elif feature_extractor == "LSTM":
         feature_extractor_config = LSTM
-    elif feature_extractor == "Spec":
-        feature_extractor_config = Spec
+    elif feature_extractor == "QLSTM":
+        feature_extractor_config = QLSTM
 
     model_config = None
     if model == "Spec2DCNN":
