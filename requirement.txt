@@ -1,0 +1,4 @@
+PennyLane==0.14.1
+PennyLane-qiskit==0.14.0
+pytorch-lightning
+segmentation_models_pytorch==0.3.3
