@@ -47,7 +47,8 @@ def post_process_for_seg(keys, preds, score_th = 0.01, distance = 5000):
                     }
                 )
         plt.tight_layout()
-        plt.show()
+        plt.savefig(f"./series_{series_id}.png")
+        plt.clf()
 
     if len(records) == 0:
         records.append(
