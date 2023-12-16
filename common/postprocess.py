@@ -30,8 +30,8 @@ def post_process_for_seg(keys, preds, score_th = 0.01, distance = 5000):
             
             plt.subplot(2, 1, i + 1)
             plt.plot(this_event_preds, label=f"{event_name} scores")
-            plt.scatter(steps, scores, color='red', label='Detected Peaks')
             plt.scatter(np.setdiff1d(np.arange(len(this_event_preds)), steps), this_event_preds[np.setdiff1d(np.arange(len(this_event_preds)), steps)], color='blue', label='Non-peaks')
+            plt.scatter(steps, scores, color='red', label='Detected Peaks')
             plt.title(f"Series ID: {series_id}, Event: {event_name}")
             plt.xlabel("Step")
             plt.ylabel("Score")
