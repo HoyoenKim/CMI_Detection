@@ -86,6 +86,8 @@ class QLSTM(nn.Module):
         recurrent_activation -> sigmoid
         activation -> tanh
         '''
+        device = 'cpu'
+        x = x.to(device)
         if self.batch_first is True:
             batch_size, seq_length, features_size = x.size()
         else:
@@ -93,8 +95,8 @@ class QLSTM(nn.Module):
 
         hidden_seq = []
         if init_states is None:
-            h_t = torch.zeros(batch_size, self.hidden_size)  # hidden state (output)
-            c_t = torch.zeros(batch_size, self.hidden_size)  # cell state
+            h_t = torch.zeros(batch_size, self.hidden_size).to(device)  # hidden state (output)
+            c_t = torch.zeros(batch_size, self.hidden_size).to(device)  # cell state
         else:
             # for now we ignore the fact that in PyTorch you can stack multiple RNNs
             # so we take only the first elements of the init_states tuple init_states[0][0], init_states[1][0]
@@ -108,7 +110,6 @@ class QLSTM(nn.Module):
             
             # Concatenate input and hidden state
             # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-            device = 'cpu'
             h_t = h_t.to(device)
             x_t = x_t.to(device)
             v_t = torch.cat((h_t, x_t), dim=1).to(device)
