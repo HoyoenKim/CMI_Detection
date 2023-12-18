@@ -107,6 +107,9 @@ class QLSTM(nn.Module):
             x_t = x[:, t, :]
             
             # Concatenate input and hidden state
+            device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+            h_t = h_t.to(device)
+            x_t = x_t.to(device)
             v_t = torch.cat((h_t, x_t), dim=1)
 
             # match qubit dimension
