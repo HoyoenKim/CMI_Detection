@@ -113,14 +113,15 @@ class QLSTM(nn.Module):
             v_t = torch.cat((h_t, x_t), dim=1)
 
             # match qubit dimension
-            y_t = self.clayer_in(v_t)
+            y_t = self.clayer_in(v_t).to(device)
 
-            f_t = torch.sigmoid(self.clayer_out(self.VQC['forget'](y_t)))  # forget block
-            i_t = torch.sigmoid(self.clayer_out(self.VQC['input'](y_t)))  # input block
-            g_t = torch.tanh(self.clayer_out(self.VQC['update'](y_t)))  # update block
-            o_t = torch.sigmoid(self.clayer_out(self.VQC['output'](y_t))) # output block
+            f_t = torch.sigmoid(self.clayer_out(self.VQC['forget'](y_t))).to(device)  # forget block
+            i_t = torch.sigmoid(self.clayer_out(self.VQC['input'](y_t))).to(device)  # input block
+            g_t = torch.tanh(self.clayer_out(self.VQC['update'](y_t))).to(device)  # update block
+            o_t = torch.sigmoid(self.clayer_out(self.VQC['output'](y_t))).to(device) # output block
 
             c_t = (f_t * c_t) + (i_t * g_t)
+            c_t = c_t.to(device)
             h_t = o_t * torch.tanh(c_t)
 
             hidden_seq.append(h_t.unsqueeze(0))
