@@ -149,8 +149,8 @@ class QLSTMFeatureExtractor(nn.Module):
         self.lstm = QLSTM(
             input_size=hidden_size,
             hidden_size=hidden_size,
-            num_layers=num_layers,
-            bidirectional=bidirectional,
+            n_qlayers=num_layers,
+            n_qubits=in_channels,
             batch_first=True,
         )
         self.out_chans = 1
