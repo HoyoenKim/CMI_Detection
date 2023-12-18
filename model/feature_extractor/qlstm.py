@@ -146,7 +146,7 @@ class QLSTMFeatureExtractor(nn.Module):
         #    padding=1,
         #)
         self.height = hidden_size * (2 if bidirectional else 1)
-        self.lstm = nn.QLSTM(
+        self.lstm = QLSTM(
             input_size=hidden_size,
             hidden_size=hidden_size,
             num_layers=num_layers,
