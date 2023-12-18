@@ -111,7 +111,7 @@ class QLSTM(nn.Module):
             device = 'cpu'
             h_t = h_t.to(device)
             x_t = x_t.to(device)
-            v_t = torch.cat((h_t, x_t), dim=1)
+            v_t = torch.cat((h_t, x_t), dim=1).to(device)
 
             # match qubit dimension
             y_t = self.clayer_in(v_t).to(device)
